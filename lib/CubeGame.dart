@@ -7,6 +7,7 @@ class CubeGame {
   CubeGame.newGame(int size) {
     this.matrix = new GameMatrix.newMatrix(size);
     status = new GameStatus.newInstance();
+    start();
   }
 
   bool checkNum(int num) {
@@ -39,11 +40,18 @@ class CubeGame {
   }
 
   score() {
+    if(status==null){
+      return GameScore(0);
+    }
     return new GameScore(status.score());
   }
 
   int number(int index) {
     return matrix.numberAt(index);
+  }
+
+  void start() {
+    status.start();
   }
 }
 
@@ -54,7 +62,7 @@ class GameStatus {
   GameStatus(this.gameCounter, this.gameRunning);
 
   GameStatus.newInstance() {
-    gameCounter = new GameCounter.start(DateTime.now());
+
     gameRunning = new GameRunning(true);
   }
 
@@ -68,7 +76,14 @@ class GameStatus {
   }
 
   score() {
+    if(gameCounter==null){
+      return 0;
+    }
     return gameCounter.score();
+  }
+
+  void start() {
+    gameCounter = new GameCounter.start(DateTime.now());
   }
 }
 

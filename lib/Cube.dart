@@ -16,38 +16,43 @@ class CubePage extends StatefulWidget {
   final String title;
 
   @override
-  _CubePageState createState() => _CubePageState(5);
+  _CubePageState createState() => _CubePageState(size);
 }
 
 class _CubePageState extends State<CubePage> {
   int _size;
-  bool playing=false;
+  bool playing = false;
   CubeGame _cubeGame;
   AudioPlayer audioPlayer;
-
+  double _blockWidth = 30;
   StreamSubscription<AudioPlayerState> _audioPlayerStateSubscription;
 
   _CubePageState(this._size);
 
   @override
   void initState() {
-    setState(() {
-      _cubeGame = CubeGame.newGame(_size);
-    });
+    _cubeGame = CubeGame.newGame(_size);
     initAudioPlayer();
     super.initState();
   }
+
   void initAudioPlayer() {
     audioPlayer = new AudioPlayer();
     _audioPlayerStateSubscription =
         audioPlayer.onPlayerStateChanged.listen((s) {
-          if (s == AudioPlayerState.PLAYING) {
-          } else if (s == AudioPlayerState.STOPPED) {
-            playing=false;
-          }
-        }, onError: (msg) {
-          playing=false;
-        });
+      if (s == AudioPlayerState.PLAYING) {
+      } else if (s == AudioPlayerState.STOPPED) {
+        playing = false;
+      }
+    }, onError: (msg) {
+      playing = false;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    initScreen();
   }
 
   @override
@@ -66,7 +71,7 @@ class _CubePageState extends State<CubePage> {
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
                   itemBuilder: (BuildContext context, int index) {
-                    return NumberBlock(_cubeGame.number(index), checkNum);
+                    return NumberBlock(_cubeGame.number(index), checkNum,_blockWidth);
                   }),
             ),
           ],
@@ -98,13 +103,21 @@ class _CubePageState extends State<CubePage> {
                       )
                     ],
                   ),
-                  Text("你的成绩：" + _cubeGame.score().toString(),
+                  Text("你的成绩：" + (_cubeGame.score()==null?"":_cubeGame.score().toString()),
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 30)),
                   RaisedButton(
                     child: Text("关闭"),
                     onPressed: () {
                       Navigator.pop(context);
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text("再来"),
+                    onPressed: () {
+                      setState(() {
+                        _cubeGame = CubeGame.newGame(_size);
+                      });
                     },
                   ),
                 ],
@@ -140,10 +153,10 @@ class _CubePageState extends State<CubePage> {
   }
 
   Future playFile(soundFile) async {
-    if(playing){
+    if (playing) {
       await audioPlayer.stop();
     }
-    playing=true;
+    playing = true;
     var file = await tryWriteFile(soundFile);
     await audioPlayer.play(file.path, isLocal: true);
   }
@@ -159,15 +172,24 @@ class _CubePageState extends State<CubePage> {
   }
 
   Future<ByteData> loadAsset(String file) async {
-    return await rootBundle.load("assets/"+file);
+    return await rootBundle.load("assets/" + file);
+  }
+
+  void initScreen(){
+    double width = (MediaQuery.of(context).size.width / _size);
+    setState(() {
+      _blockWidth = width*0.4;
+    });
   }
 }
 
 class NumberBlock extends StatelessWidget {
   int _number;
   var _onpress;
+  double _blockWidth;
 
-  NumberBlock(this._number, this._onpress);
+
+  NumberBlock(this._number, this._onpress, this._blockWidth);
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +208,7 @@ class NumberBlock extends StatelessWidget {
               children: <Widget>[
                 Text(
                   _number.toString(),
-                  style: TextStyle(fontSize: 30),
+                  style: TextStyle(fontSize: _blockWidth),
                 )
               ],
             )));

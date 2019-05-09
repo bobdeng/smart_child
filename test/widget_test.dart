@@ -13,18 +13,17 @@ void main() {
   test("run ganme", (){
     var cubeGame = CubeGame.newGame(5);
     expect(cubeGame.size(), 25);
+    expect(cubeGame.score()!=null, true);
+    cubeGame.start();
     for(int i=0;i<25;i++){
-      guess(cubeGame);
+      guess(cubeGame,i+1);
     }
     expect(cubeGame.isOver(),true);
-    expect(cubeGame.score()>0,true);
   });
 }
 
-void guess(CubeGame cubeGame) {
-  for(int i=0;i<25;i++){
-    if(cubeGame.checkNum(i+1)){
-      return;
-    }
-  }
+void guess(CubeGame cubeGame,int num) {
+  expect(cubeGame.checkNum(num+1), false);
+  expect(cubeGame.checkNum(num-1), false);
+  expect(cubeGame.checkNum(num), true);
 }
