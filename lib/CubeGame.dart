@@ -39,7 +39,7 @@ class CubeGame {
   }
 
   score() {
-    return status.score();
+    return new GameScore(status.score());
   }
 
   int number(int index) {
@@ -182,5 +182,14 @@ class Timer {
 
   int minus(Timer start) {
     return time.millisecondsSinceEpoch-start.time.millisecondsSinceEpoch;
+  }
+}
+class GameScore{
+  int time;
+
+  GameScore(this.time);
+
+  String toString(){
+    return (time~/1000).toString()+"."+(time%1000).toString();
   }
 }

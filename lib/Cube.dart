@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 
 import 'package:smart_child/CubeGame.dart';
+import 'package:audioplayer/audioplayer.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CubePage extends StatefulWidget {
   int size;
@@ -16,7 +21,11 @@ class CubePage extends StatefulWidget {
 
 class _CubePageState extends State<CubePage> {
   int _size;
+  bool playing=false;
   CubeGame _cubeGame;
+  AudioPlayer audioPlayer;
+
+  StreamSubscription<AudioPlayerState> _audioPlayerStateSubscription;
 
   _CubePageState(this._size);
 
@@ -25,7 +34,20 @@ class _CubePageState extends State<CubePage> {
     setState(() {
       _cubeGame = CubeGame.newGame(_size);
     });
+    initAudioPlayer();
     super.initState();
+  }
+  void initAudioPlayer() {
+    audioPlayer = new AudioPlayer();
+    _audioPlayerStateSubscription =
+        audioPlayer.onPlayerStateChanged.listen((s) {
+          if (s == AudioPlayerState.PLAYING) {
+          } else if (s == AudioPlayerState.STOPPED) {
+            playing=false;
+          }
+        }, onError: (msg) {
+          playing=false;
+        });
   }
 
   @override
@@ -59,33 +81,35 @@ class _CubePageState extends State<CubePage> {
               opacity: 0.90,
             )),
         Visibility(
-          visible: _cubeGame.isOver(),
-          child: Container(
-            child:
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Row(children: <Widget>[
-                  Expanded(
-                    child:Text(
-                      "游戏结束",
+            visible: _cubeGame.isOver(),
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "游戏结束",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 30),
+                        ),
+                      )
+                    ],
+                  ),
+                  Text("你的成绩：" + _cubeGame.score().toString(),
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  )
-                ],),
-                Text("你的成绩：" + _cubeGame.score().toString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 30)),
-                RaisedButton(
-                  child: Text("关闭"),
-                  onPressed: (){Navigator.pop(context);},
-                ),
-              ],
-            ),
-          )
-        )
+                      style: TextStyle(fontSize: 30)),
+                  RaisedButton(
+                    child: Text("关闭"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            ))
       ],
     ));
   }
@@ -99,18 +123,43 @@ class _CubePageState extends State<CubePage> {
     playFail();
   }
 
-  void playSuccess() {
+  void playSuccess() async {
     print("next");
+    await playFile("success.mp3");
   }
 
-  void playFail() {
+  void playFail() async {
     print("fail");
+    await playFile("fail.mp3");
   }
 
   void checkOver() {
     if (_cubeGame.isOver()) {
       setState(() {});
     }
+  }
+
+  Future playFile(soundFile) async {
+    if(playing){
+      await audioPlayer.stop();
+    }
+    playing=true;
+    var file = await tryWriteFile(soundFile);
+    await audioPlayer.play(file.path, isLocal: true);
+  }
+
+  Future<File> tryWriteFile(soundFile) async {
+    final file =
+        new File('${(await getTemporaryDirectory()).path}/' + soundFile);
+    if (await file.exists()) {
+      return file;
+    }
+    await file.writeAsBytes((await loadAsset(soundFile)).buffer.asUint8List());
+    return file;
+  }
+
+  Future<ByteData> loadAsset(String file) async {
+    return await rootBundle.load("assets/"+file);
   }
 }
 
