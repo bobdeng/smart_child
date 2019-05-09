@@ -120,10 +120,7 @@ class GameNumbers {
   }
 
   List<int> generateRandomNumbers(int size) {
-    List<int> numbers = [];
-    for (int i = 1; i <= size * size; i++) {
-      numbers.add(i);
-    }
+    List<int> numbers = new List<int>.generate(size, (i)=>i+1);
     numbers.shuffle();
     return numbers;
   }
