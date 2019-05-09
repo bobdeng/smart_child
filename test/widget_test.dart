@@ -14,7 +14,6 @@ void main() {
     var cubeGame = CubeGame.newGame(5);
     expect(cubeGame.size(), 25);
     expect(cubeGame.score()!=null, true);
-    cubeGame.start();
     for(int i=0;i<25;i++){
       guess(cubeGame,i+1);
     }

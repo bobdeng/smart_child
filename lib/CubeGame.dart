@@ -7,7 +7,6 @@ class CubeGame {
   CubeGame.newGame(int size) {
     this.matrix = new GameMatrix.newMatrix(size);
     status = new GameStatus.newInstance();
-    start();
   }
 
   bool checkNum(int num) {
@@ -18,7 +17,7 @@ class CubeGame {
   }
 
   bool doCheckNum(int num) {
-    if(matrix.checkNum(num)){
+    if (matrix.checkNum(num)) {
       checkGameOver();
       return true;
     }
@@ -40,7 +39,7 @@ class CubeGame {
   }
 
   score() {
-    if(status==null){
+    if (status == null) {
       return GameScore(0);
     }
     return new GameScore(status.score());
@@ -49,20 +48,14 @@ class CubeGame {
   int number(int index) {
     return matrix.numberAt(index);
   }
-
-  void start() {
-    status.start();
-  }
 }
 
 class GameStatus {
   GameCounter gameCounter;
   GameRunning gameRunning;
 
-  GameStatus(this.gameCounter, this.gameRunning);
-
   GameStatus.newInstance() {
-
+    gameCounter = new GameCounter.start(DateTime.now());
     gameRunning = new GameRunning(true);
   }
 
@@ -71,19 +64,15 @@ class GameStatus {
   }
 
   void finishGame() {
-    gameRunning=new GameRunning(false);
+    gameRunning = new GameRunning(false);
     gameCounter.finishGame();
   }
 
   score() {
-    if(gameCounter==null){
+    if (gameCounter == null) {
       return 0;
     }
     return gameCounter.score();
-  }
-
-  void start() {
-    gameCounter = new GameCounter.start(DateTime.now());
   }
 }
 
@@ -103,7 +92,7 @@ class GameMatrix {
 
   GameMatrix.newMatrix(int size) {
     numbers = new GameNumbers.newInstance(size);
-    cursor = new GameCursor(0);
+    cursor = new GameCursor.newInstance();
   }
 
   bool checkNum(int num) {
@@ -111,10 +100,10 @@ class GameMatrix {
   }
 
   bool isOver() {
-    return cursor.cursor>=numbers.size();
+    return cursor.cursor >= numbers.size();
   }
 
-  size() {
+  int size() {
     return numbers.size();
   }
 
@@ -139,10 +128,6 @@ class GameNumbers {
     return numbers;
   }
 
-  bool checkNum(int num, GameCursor cursor) {
-    return num==numbers[cursor.cursor];
-  }
-
   int size() {
     return numbers.length;
   }
@@ -155,14 +140,12 @@ class GameNumbers {
 class GameCursor {
   int cursor;
 
-  GameCursor(this.cursor);
-
-  void next() {
-    cursor++;
+  GameCursor.newInstance() {
+    cursor = 0;
   }
 
   bool checkNum(int num) {
-    if(cursor+1==num){
+    if (cursor + 1 == num) {
       cursor++;
       return true;
     }
@@ -179,11 +162,11 @@ class GameCounter {
   }
 
   void finishGame() {
-    end=new Timer(DateTime.now());
+    end = new Timer(DateTime.now());
   }
 
   score() {
-    if(end==null) return 0;
+    if (end == null) return 0;
     return end.minus(start);
   }
 }
@@ -196,15 +179,16 @@ class Timer {
   }
 
   int minus(Timer start) {
-    return time.millisecondsSinceEpoch-start.time.millisecondsSinceEpoch;
+    return time.millisecondsSinceEpoch - start.time.millisecondsSinceEpoch;
   }
 }
-class GameScore{
+
+class GameScore {
   int time;
 
   GameScore(this.time);
 
-  String toString(){
-    return (time~/1000).toString()+"."+(time%1000).toString();
+  String toString() {
+    return (time ~/ 1000).toString() + "." + (time % 1000).toString();
   }
 }
