@@ -103,7 +103,7 @@ class _CubePageState extends State<CubePage> {
                       )
                     ],
                   ),
-                  Text("你的成绩：" + (_cubeGame.score()==null?"":_cubeGame.score().toString()),
+                  Text("你的成绩：" +_cubeGame.score().toString(),
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 30)),
                   RaisedButton(

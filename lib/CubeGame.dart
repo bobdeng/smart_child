@@ -1,52 +1,49 @@
 import 'dart:math';
 
 class CubeGame {
-  GameMatrix matrix;
-  GameStatus status;
+  GameMatrix _matrix;
+  GameStatus _status;
 
   CubeGame.newGame(int size) {
-    this.matrix = new GameMatrix.newMatrix(size);
-    status = new GameStatus.newInstance();
+    this._matrix = new GameMatrix.newMatrix(size);
+    _status = new GameStatus.newInstance();
   }
 
   bool checkNum(int num) {
-    if (status.isOver()) {
+    if (_status.isOver()) {
       return false;
     }
-    return doCheckNum(num);
+    return _checkNum(num);
   }
 
-  bool doCheckNum(int num) {
-    if (matrix.checkNum(num)) {
-      checkGameOver();
+  bool _checkNum(int num) {
+    if (_matrix.checkNum(num)) {
+      _checkGameOver();
       return true;
     }
     return false;
   }
 
-  void checkGameOver() {
-    if (matrix.isOver()) {
-      status.finishGame();
+  void _checkGameOver() {
+    if (_matrix.isOver()) {
+      _status.finishGame();
     }
   }
 
   isOver() {
-    return status.isOver();
+    return _status.isOver();
   }
 
   size() {
-    return matrix.size();
+    return _matrix.size();
   }
 
   score() {
-    if (status == null) {
-      return GameScore(0);
-    }
-    return new GameScore(status.score());
+    return new GameScore(_status.score());
   }
 
   int number(int index) {
-    return matrix.numberAt(index);
+    return _matrix.numberAt(index);
   }
 }
 
@@ -68,7 +65,7 @@ class GameStatus {
     gameCounter.finishGame();
   }
 
-  score() {
+  int score() {
     if (gameCounter == null) {
       return 0;
     }
@@ -96,7 +93,11 @@ class GameMatrix {
   }
 
   bool checkNum(int num) {
-    return cursor.checkNum(num);
+    bool result = cursor.checkNum(num);
+    if (result) {
+      cursor.next();
+    }
+    return result;
   }
 
   bool isOver() {
@@ -120,7 +121,7 @@ class GameNumbers {
   }
 
   List<int> generateRandomNumbers(int size) {
-    List<int> numbers = new List<int>.generate(size, (i)=>i+1);
+    List<int> numbers = new List<int>.generate(size * size, (i) => i + 1);
     numbers.shuffle();
     return numbers;
   }
@@ -142,11 +143,11 @@ class GameCursor {
   }
 
   bool checkNum(int num) {
-    if (cursor + 1 == num) {
-      cursor++;
-      return true;
-    }
-    return false;
+    return cursor + 1 == num;
+  }
+
+  next() {
+    cursor++;
   }
 }
 
@@ -162,7 +163,7 @@ class GameCounter {
     end = new Timer(DateTime.now());
   }
 
-  score() {
+  int score() {
     if (end == null) return 0;
     return end.minus(start);
   }
