@@ -11,14 +11,20 @@ import 'package:smart_child/CubeGame.dart';
 
 void main() {
   test("run ganme", (){
-    var cubeGame = CubeGame.newGame(5);
-    expect(cubeGame.size(), 25);
-    expect(cubeGame.score()!=null, true);
-    for(int i=0;i<25;i++){
-      guess(cubeGame,i+1);
-    }
-    expect(cubeGame.isOver(),true);
+    testCubeGame(5);
+    testCubeGame(3);
+    testCubeGame(9);
   });
+}
+
+void testCubeGame(int size) {
+  var cubeGame = CubeGame.newGame(size);
+  expect(cubeGame.size(), size*size);
+  expect(cubeGame.score()!=null, true);
+  for(int i=0;i<size*size;i++){
+    guess(cubeGame,i+1);
+  }
+  expect(cubeGame.isOver(),true);
 }
 
 void guess(CubeGame cubeGame,int num) {
