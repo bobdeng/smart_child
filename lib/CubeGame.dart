@@ -41,6 +41,10 @@ class CubeGame {
   score() {
     return status.score();
   }
+
+  int number(int index) {
+    return matrix.numberAt(index);
+  }
 }
 
 class GameStatus {
@@ -88,11 +92,7 @@ class GameMatrix {
   }
 
   bool checkNum(int num) {
-    if(numbers.checkNum(num,cursor)){
-      cursor.next();
-      return true;
-    }
-    return false;
+    return cursor.checkNum(num);
   }
 
   bool isOver() {
@@ -101,6 +101,10 @@ class GameMatrix {
 
   size() {
     return numbers.size();
+  }
+
+  int numberAt(int index) {
+    return numbers.at(index);
   }
 }
 
@@ -127,6 +131,10 @@ class GameNumbers {
   int size() {
     return numbers.length;
   }
+
+  int at(int index) {
+    return numbers[index];
+  }
 }
 
 class GameCursor {
@@ -136,6 +144,14 @@ class GameCursor {
 
   void next() {
     cursor++;
+  }
+
+  bool checkNum(int num) {
+    if(cursor+1==num){
+      cursor++;
+      return true;
+    }
+    return false;
   }
 }
 

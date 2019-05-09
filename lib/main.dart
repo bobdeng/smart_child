@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_child/Cube.dart';
 
 void main() => runApp(MyApp());
 
@@ -76,5 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void openCube() {
+    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new CubePage(size: 5)));
   }
 }
