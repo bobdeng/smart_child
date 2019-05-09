@@ -168,6 +168,7 @@ class GameCounter {
   }
 
   score() {
+    if(end==null) return 0;
     return end.minus(start);
   }
 }
