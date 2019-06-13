@@ -2,11 +2,12 @@ import 'dart:math';
 import 'GameCounter.dart';
 class MathGame {
   GameType type;
-  int max;
-  int current;
+  MathType mathType;
   int paramA;
   int paramB;
   Range range;
+  int max;
+  int current;
   int right;
   GameCounter counter;
 
@@ -21,6 +22,7 @@ class MathGame {
   static MathGame newMathGame(int max, Range range,GameType type) {
     MathGame game = new MathGame();
     game.type = type;
+    game.mathType=getMathType(type);
     game.max=max;
     game.range=range;
     game.current=0;
@@ -41,7 +43,7 @@ class MathGame {
     return current<max;
   }
 
-  getCurrent() {
+  getProgress() {
     return current;
   }
   getMax(){
@@ -52,10 +54,9 @@ class MathGame {
     current++;
     paramA = range.getRandom();
     paramB = range.getRandom();
-    return getQuestion();
+    return mathType.getQuestion(paramA, paramB);
   }
 
-  String getQuestion() => paramA.toString()+getTypeChar()+paramB.toString();
 
   score() {
     return right*100/max;
@@ -63,7 +64,7 @@ class MathGame {
 
   answer(int answer) {
     if (!checkAnswer(answer)) {
-       wrongs.addWrong(getQuestion(), getRightAnswer().toString(), answer.toString());
+       wrongs.addWrong(mathType.getQuestion(paramA, paramB), getRightAnswer().toString(), answer.toString());
     }
     if(!hasNext()){
       counter.finishGame();
@@ -79,28 +80,7 @@ class MathGame {
   }
 
   int getRightAnswer() {
-    int rightAnswer=0;
-    if(type==GameType.PLUS) {
-      rightAnswer= paramB + paramA;
-    }
-    if(type==GameType.MINUS){
-      rightAnswer= paramA - paramB;
-    }
-    if(type==GameType.MILTY){
-      rightAnswer= paramA * paramB;
-    }
-    return rightAnswer;
-  }
-
-  String getTypeChar() {
-    switch(type){
-      case GameType.PLUS:
-        return "+";
-      case GameType.MINUS:
-        return "-";
-      case GameType.MILTY:
-        return "*";
-    }
+    return mathType.answer(paramA, paramB);
   }
 
   int getUsedTime() {
@@ -109,6 +89,17 @@ class MathGame {
 
   Wrongs wrongAnswer() {
     return wrongs;
+  }
+
+  static MathType getMathType(GameType type) {
+    switch(type){
+      case GameType.PLUS:
+        return new PlusMath();
+      case GameType.MINUS:
+        return new MinusMath();
+      case GameType.MILTY:
+        return new MiltyMath();
+    }
   }
 }
 
@@ -121,6 +112,48 @@ class Range{
   int getRandom() {
     var random = new Random();
     return min+random.nextInt(max-min);
+  }
+
+}
+abstract class MathType{
+
+  String getQuestion(int p1,int p2);
+  int answer(int p1,int p2);
+}
+class PlusMath extends MathType{
+  @override
+  int answer(int p1, int p2) {
+    return p1+p2;
+  }
+
+  @override
+  String getQuestion(int p1, int p2) {
+    return p1.toString()+"+"+p2.toString();
+  }
+
+}
+class MinusMath extends MathType{
+  @override
+  int answer(int p1, int p2) {
+    return p1-p2;
+  }
+
+  @override
+  String getQuestion(int p1, int p2) {
+    return p1.toString()+"-"+p2.toString();
+  }
+
+
+}
+class MiltyMath extends MathType{
+  @override
+  int answer(int p1, int p2) {
+    return p1*p2;
+  }
+
+  @override
+  String getQuestion(int p1, int p2) {
+    return p1.toString()+"*"+p2.toString();
   }
 
 }

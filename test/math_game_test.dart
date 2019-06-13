@@ -29,7 +29,7 @@ void main() {
 
 void testGame(MathGame mathGame,int Function(int a, int b) compute,Pattern splitPattern) async{
   int start=DateTime.now().millisecondsSinceEpoch;
-  expect(mathGame.getCurrent(), 0);
+  expect(mathGame.getProgress(), 0);
   expect(mathGame.getMax(), 100);
   expect(mathGame.hasNext(), true);
   var random = new Random();
