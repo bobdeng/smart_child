@@ -101,6 +101,14 @@ class MathGame {
         return new MiltyMath();
     }
   }
+
+  String getQuestion() {
+    return mathType.getQuestion(paramA, paramB);
+  }
+
+  String rightCount() {
+    return right.toString();
+  }
 }
 
 class Range{

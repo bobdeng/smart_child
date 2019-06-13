@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_child/Cube.dart';
+import 'package:smart_child/Math.dart';
+import 'package:smart_child/MathGame.dart';
 
 void main() => runApp(MyApp());
 
@@ -93,11 +95,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void openPlus() {
-  }
+    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new MathPage(game: MathGame.createPlusGame(100, new Range(10, 100)))));
+    }
 
   void openMinus() {
+    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new MathPage(game: MathGame.createMinusGame(100, new Range(10, 100)))));
+
   }
 
   void openMilty() {
+    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new MathPage(game: MathGame.createMiltyGame(100, new Range(2, 30)))));
+
   }
 }
