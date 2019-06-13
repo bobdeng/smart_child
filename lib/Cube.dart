@@ -61,6 +61,8 @@ class _CubePageState extends State<CubePage> {
         body: Stack(
       children: <Widget>[
         Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
               padding: EdgeInsets.all(15),
