@@ -70,6 +70,18 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text("舒伯特方块"),
               onPressed: openCube,
             ),
+            RaisedButton(
+              child: Text("100内加法训练"),
+              onPressed: openPlus,
+            ),
+            RaisedButton(
+              child: Text("100内减法训练"),
+              onPressed: openMinus,
+            ),
+            RaisedButton(
+              child: Text("20内乘法训练"),
+              onPressed: openMilty,
+            ),
           ],
         ),
       ) // This trailing comma makes auto-formatting nicer for build methods.
@@ -78,5 +90,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void openCube() {
     Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new CubePage(size: 5)));
+  }
+
+  void openPlus() {
+  }
+
+  void openMinus() {
+  }
+
+  void openMilty() {
   }
 }
