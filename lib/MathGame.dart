@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'GameCounter.dart';
 class MathGame {
   GameType type;
   int max;
@@ -8,6 +8,9 @@ class MathGame {
   int paramB;
   Range range;
   int right;
+  GameCounter counter;
+
+  Wrongs wrongs;
   static MathGame createPlusGame(int max,Range range) {
     return newMathGame(max, range,GameType.PLUS);
   }
@@ -22,6 +25,8 @@ class MathGame {
     game.range=range;
     game.current=0;
     game.right=0;
+    game.counter=GameCounter.start(DateTime.now());
+    game.wrongs=new Wrongs();
     return game;
   }
   static MathGame createMinusGame(int max, Range range) {
@@ -47,33 +52,44 @@ class MathGame {
     current++;
     paramA = range.getRandom();
     paramB = range.getRandom();
-    return paramA.toString()+getTypeChar()+paramB.toString();
+    return getQuestion();
   }
+
+  String getQuestion() => paramA.toString()+getTypeChar()+paramB.toString();
 
   score() {
     return right*100/max;
   }
 
-  bool answer(int answer) {
-    if(type==GameType.PLUS) {
-      if (answer == paramB + paramA) {
-        right++;
-        return true;
-      }
+  answer(int answer) {
+    if (!checkAnswer(answer)) {
+       wrongs.addWrong(getQuestion(), getRightAnswer().toString(), answer.toString());
     }
-    if(type==GameType.MINUS){
-      if (answer == paramA - paramB) {
-        right++;
-        return true;
-      }
+    if(!hasNext()){
+      counter.finishGame();
     }
-    if(type==GameType.MILTY){
-      if (answer == paramA * paramB) {
-        right++;
-        return true;
-      }
+  }
+
+  bool checkAnswer(int answer) {
+    if(getRightAnswer()==answer){
+      right++;
+      return true;
     }
     return false;
+  }
+
+  int getRightAnswer() {
+    int rightAnswer=0;
+    if(type==GameType.PLUS) {
+      rightAnswer= paramB + paramA;
+    }
+    if(type==GameType.MINUS){
+      rightAnswer= paramA - paramB;
+    }
+    if(type==GameType.MILTY){
+      rightAnswer= paramA * paramB;
+    }
+    return rightAnswer;
   }
 
   String getTypeChar() {
@@ -87,9 +103,13 @@ class MathGame {
     }
   }
 
+  int getUsedTime() {
+    return counter.score();
+  }
 
-
-
+  Wrongs wrongAnswer() {
+    return wrongs;
+  }
 }
 
 class Range{
@@ -102,6 +122,28 @@ class Range{
     var random = new Random();
     return min+random.nextInt(max-min);
   }
+
+}
+class Wrongs{
+  List<Wrong> wrongs=[];
+
+  Wrongs();
+  
+  void addWrong(String question,String right,String answer){
+    wrongs.add(new Wrong(question, right, answer));
+  }
+
+  size() {
+    return wrongs.length;
+  }
+
+}
+class Wrong{
+  String question;
+  String right;
+  String wrong;
+
+  Wrong(this.question, this.right, this.wrong);
 
 }
 enum GameType {

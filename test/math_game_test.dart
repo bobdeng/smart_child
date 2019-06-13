@@ -27,7 +27,8 @@ void main() {
   });
 }
 
-void testGame(MathGame mathGame,int Function(int a, int b) compute,Pattern splitPattern) {
+void testGame(MathGame mathGame,int Function(int a, int b) compute,Pattern splitPattern) async{
+  int start=DateTime.now().millisecondsSinceEpoch;
   expect(mathGame.getCurrent(), 0);
   expect(mathGame.getMax(), 100);
   expect(mathGame.hasNext(), true);
@@ -45,9 +46,15 @@ void testGame(MathGame mathGame,int Function(int a, int b) compute,Pattern split
       skew=0;
       score++;
     }
-    bool result = mathGame.answer(
+    mathGame.answer(
         compute(int.parse(split[0]), int.parse(split[1]))+skew);
-    expect(result, skew==0);
+    await Future.delayed(Duration(milliseconds: 1));
   }
+
+  int count1=mathGame.getUsedTime();
+  print(count1);
+  expect(count1>0,true);
   expect(mathGame.score(), score);
+  expect(mathGame.wrongAnswer().size(), 100-score);
+
 }
