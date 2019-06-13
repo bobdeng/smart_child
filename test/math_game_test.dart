@@ -35,7 +35,9 @@ void testGame(MathGame mathGame,int Function(int a, int b) compute,Pattern split
   var random = new Random();
   int score=0;
   int skew=0;
+  int count=0;
   while(mathGame.hasNext()){
+    count++;
     String problem=mathGame.next();
     var split = problem.split(splitPattern);
     expect(split.length, 2);
@@ -50,9 +52,9 @@ void testGame(MathGame mathGame,int Function(int a, int b) compute,Pattern split
         compute(int.parse(split[0]), int.parse(split[1]))+skew);
     await Future.delayed(Duration(milliseconds: 1));
   }
-
+  expect(count, 100);
+  expect(mathGame.hasNext(), false);
   int count1=mathGame.getUsedTime();
-  print(count1);
   expect(count1>0,true);
   expect(mathGame.score(), score);
   expect(mathGame.wrongAnswer().size(), 100-score);

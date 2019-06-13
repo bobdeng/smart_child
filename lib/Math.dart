@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:smart_child/MathGame.dart';
+import 'package:smart_child/MathGameResult.dart';
 
 class MathPage extends StatefulWidget {
   MathGame game;
@@ -52,7 +53,9 @@ class _MathPageState extends State<MathPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text("正确："+widget.game.rightCount(),textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 30))
+                  style: TextStyle(fontSize: 30)),
+              Text("错误："+widget.game.wrongs.size().toString(),textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 30,color: Colors.redAccent))
             ],
           ),
           LinearProgressIndicator(value: widget.game.getProgress()*1.0/widget.game.getMax(),),
@@ -94,8 +97,12 @@ class _MathPageState extends State<MathPage> {
                               if(_keyboard[index].char=="OK"){
                                 setState(() {
                                   widget.game.answer(int.parse(_answer));
-                                  widget.game.next();
-                                  _answer="";
+                                  if(widget.game.hasNext()){
+                                    _answer="";
+                                    widget.game.next();
+                                  }else{
+                                    showGameResult();
+                                  }
                                 });
 
                               }
@@ -105,9 +112,8 @@ class _MathPageState extends State<MathPage> {
                       return new FlatButton(
                         onPressed:(){
                           setState(() {
-                            _answer+=_keyboard[index].char;
+                            _answer += _keyboard[index].char;
                           });
-
                         },
                           child: Text(_keyboard[index].char,textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 30)));
@@ -121,6 +127,11 @@ class _MathPageState extends State<MathPage> {
   }
 
   String getProgressText() => widget.game.getProgress().toString()+"/"+widget.game.getMax().toString();
+
+  void showGameResult() {
+    Navigator.pop(context);
+    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new MathGameResultPage(game: widget.game)));
+  }
 }
 
 class KeyBoard {

@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'GameCounter.dart';
+
 class MathGame {
   GameType type;
   MathType mathType;
-  int paramA;
-  int paramB;
+  Parameters parameters;
   Range range;
   int max;
   int current;
@@ -12,27 +12,30 @@ class MathGame {
   GameCounter counter;
 
   Wrongs wrongs;
-  static MathGame createPlusGame(int max,Range range) {
-    return newMathGame(max, range,GameType.PLUS);
-  }
-  static MathGame createMiltyGame(int max, Range range) {
-    return newMathGame(max, range,GameType.MILTY);
+
+  static MathGame createPlusGame(int max, Range range) {
+    return newMathGame(max, range, GameType.PLUS);
   }
 
-  static MathGame newMathGame(int max, Range range,GameType type) {
+  static MathGame createMiltyGame(int max, Range range) {
+    return newMathGame(max, range, GameType.MILTY);
+  }
+
+  static MathGame newMathGame(int max, Range range, GameType type) {
     MathGame game = new MathGame();
     game.type = type;
-    game.mathType=getMathType(type);
-    game.max=max;
-    game.range=range;
-    game.current=0;
-    game.right=0;
-    game.counter=GameCounter.start(DateTime.now());
-    game.wrongs=new Wrongs();
+    game.mathType = getMathType(type);
+    game.max = max;
+    game.range = range;
+    game.current = 0;
+    game.right = 0;
+    game.counter = GameCounter.start(DateTime.now());
+    game.wrongs = new Wrongs();
     return game;
   }
+
   static MathGame createMinusGame(int max, Range range) {
-    return newMathGame(max, range,GameType.MINUS);
+    return newMathGame(max, range, GameType.MINUS);
   }
 
   getType() {
@@ -40,39 +43,39 @@ class MathGame {
   }
 
   hasNext() {
-    return current<max;
+    return current < max;
   }
 
   getProgress() {
     return current;
   }
-  getMax(){
+
+  getMax() {
     return max;
   }
 
   String next() {
     current++;
-    paramA = range.getRandom();
-    paramB = range.getRandom();
-    return mathType.getQuestion(paramA, paramB);
+    parameters = mathType.getRandomParameters(range);
+    return mathType.getQuestion(parameters);
   }
 
-
   score() {
-    return right*100/max;
+    return right * 100 / max;
   }
 
   answer(int answer) {
     if (!checkAnswer(answer)) {
-       wrongs.addWrong(mathType.getQuestion(paramA, paramB), getRightAnswer().toString(), answer.toString());
+      wrongs.addWrong(mathType.getQuestion(parameters),
+          getRightAnswer().toString(), answer.toString());
     }
-    if(!hasNext()){
+    if (!hasNext()) {
       counter.finishGame();
     }
   }
 
   bool checkAnswer(int answer) {
-    if(getRightAnswer()==answer){
+    if (getRightAnswer() == answer) {
       right++;
       return true;
     }
@@ -80,7 +83,7 @@ class MathGame {
   }
 
   int getRightAnswer() {
-    return mathType.answer(paramA, paramB);
+    return mathType.answer(parameters);
   }
 
   int getUsedTime() {
@@ -92,7 +95,7 @@ class MathGame {
   }
 
   static MathType getMathType(GameType type) {
-    switch(type){
+    switch (type) {
       case GameType.PLUS:
         return new PlusMath();
       case GameType.MINUS:
@@ -103,7 +106,7 @@ class MathGame {
   }
 
   String getQuestion() {
-    return mathType.getQuestion(paramA, paramB);
+    return mathType.getQuestion(parameters);
   }
 
   String rightCount() {
@@ -111,7 +114,18 @@ class MathGame {
   }
 }
 
-class Range{
+class Parameters {
+  int paramA;
+  int paramB;
+
+  Parameters(this.paramA, this.paramB);
+
+  int add() {
+    return paramA + paramB;
+  }
+}
+
+class Range {
   int min;
   int max;
 
@@ -119,58 +133,68 @@ class Range{
 
   int getRandom() {
     var random = new Random();
-    return min+random.nextInt(max-min);
+    return min + random.nextInt(max - min);
   }
-
 }
-abstract class MathType{
 
-  String getQuestion(int p1,int p2);
-  int answer(int p1,int p2);
+abstract class MathType {
+  String getQuestion(Parameters p);
+
+  int answer(Parameters p);
+
+  Parameters getRandomParameters(Range range) {
+    return new Parameters(range.getRandom(), range.getRandom());
+  }
 }
-class PlusMath extends MathType{
+
+class PlusMath extends MathType {
   @override
-  int answer(int p1, int p2) {
-    return p1+p2;
+  int answer(Parameters p) {
+    return p.add();
   }
 
   @override
-  String getQuestion(int p1, int p2) {
-    return p1.toString()+"+"+p2.toString();
+  String getQuestion(Parameters p) {
+    return p.paramA.toString() + "+" + p.paramB.toString();
   }
-
 }
-class MinusMath extends MathType{
+
+class MinusMath extends MathType {
   @override
-  int answer(int p1, int p2) {
-    return p1-p2;
+  int answer(Parameters p) {
+    return p.paramA - p.paramB;
   }
 
   @override
-  String getQuestion(int p1, int p2) {
-    return p1.toString()+"-"+p2.toString();
+  String getQuestion(Parameters p) {
+    return p.paramA.toString() + "-" + p.paramB.toString();
   }
 
-
+  Parameters getRandomParameters(Range range) {
+    int param1 = range.getRandom();
+    int param2 = range.getRandom();
+    return new Parameters(max(param1, param2), min(param1, param2));
+  }
 }
-class MiltyMath extends MathType{
+
+class MiltyMath extends MathType {
   @override
-  int answer(int p1, int p2) {
-    return p1*p2;
+  int answer(Parameters p) {
+    return p.paramB * p.paramA;
   }
 
   @override
-  String getQuestion(int p1, int p2) {
-    return p1.toString()+"*"+p2.toString();
+  String getQuestion(Parameters p) {
+    return p.paramA.toString() + "*" + p.paramB.toString();
   }
-
 }
-class Wrongs{
-  List<Wrong> wrongs=[];
+
+class Wrongs {
+  List<Wrong> wrongs = [];
 
   Wrongs();
-  
-  void addWrong(String question,String right,String answer){
+
+  void addWrong(String question, String right, String answer) {
     wrongs.add(new Wrong(question, right, answer));
   }
 
@@ -178,8 +202,12 @@ class Wrongs{
     return wrongs.length;
   }
 
+  Wrong get(int index) {
+    return wrongs[index];
+  }
 }
-class Wrong{
+
+class Wrong {
   String question;
   String right;
   String wrong;
@@ -187,6 +215,5 @@ class Wrong{
   Wrong(this.question, this.right, this.wrong);
 
 }
-enum GameType {
-  PLUS, MINUS, MILTY
-}
+
+enum GameType { PLUS, MINUS, MILTY }
